@@ -5,6 +5,7 @@ from bpy_extras.image_utils import load_image
 from bpy_extras import node_shader_utils
 
 from ..gui import gui
+from .common import find_material_node
 from .msh_importer import MshImporter
 from ..types.skn import SKN, MatPropType
 
@@ -12,9 +13,9 @@ from ..types.skn import SKN, MatPropType
 def add_transparent_node(node_tree):
     nodes = node_tree.nodes
 
-    output_node = nodes.get('Material Output')
-    bsdf_node = nodes.get('Principled BSDF')
-    texture_node = nodes.get(bpy.app.translations.pgettext('Image Texture'))
+    output_node = find_material_node(nodes, 'OUTPUT_MATERIAL')
+    bsdf_node = find_material_node(nodes, 'BSDF_PRINCIPLED')
+    texture_node = find_material_node(nodes, 'TEX_IMAGE')
 
     mix_shader_node = nodes.new('ShaderNodeMixShader')
     transparent_node = nodes.new('ShaderNodeBsdfTransparent')

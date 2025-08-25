@@ -133,7 +133,7 @@ class DN_ExportSKN(bpy.types.Operator, ExportHelper):
     )
 
     msh_name: StringProperty(
-        name = "Custom MSH FIle Name",
+        name = "Custom MSH File Name",
         description = "File name used for exporting the MSH file. Leave blank if MSH name is same as SKN name"
     )
 

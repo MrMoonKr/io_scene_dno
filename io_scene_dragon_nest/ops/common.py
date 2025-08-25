@@ -46,3 +46,7 @@ def get_armature_matrices(armature_object):
     for bone in armature_object.data.bones:
         matrices[bone.name] = bone.matrix_local @ scale_matrix(bone.dragon_nest.scale)
     return matrices
+
+
+def find_material_node(nodes, node_type):
+    return next((node for node in nodes if node.type == node_type), None)
