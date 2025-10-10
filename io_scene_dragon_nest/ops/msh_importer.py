@@ -3,7 +3,13 @@ import bmesh
 
 from mathutils import Matrix, Vector
 
-from .common import oriented_matrix, translation_matrix, rotation_matrix, scale_matrix
+from .common import (
+    oriented_matrix,
+    translation_matrix,
+    rotation_matrix,
+    scale_matrix,
+    format_object_name,
+)
 from ..gui import gui
 from ..types.msh import MSH, CollisionType
 
@@ -105,7 +111,9 @@ class MshImporter:
             mesh.validate()
             mesh.update()
 
-            mesh_obj = bpy.data.objects.new(msh_mesh.name, mesh)
+            mesh_obj_name = format_object_name(msh_mesh.name)
+
+            mesh_obj = bpy.data.objects.new(mesh_obj_name, mesh)
             mesh_obj.dragon_nest.type = 'OBJ'
             mesh_obj.dragon_nest.parent_name = msh_mesh.parent_name
             mesh_obj.dragon_nest.use_tristrip = msh_mesh.use_tristrip
@@ -129,7 +137,9 @@ class MshImporter:
 
         # create dummies
         for msh_dummy in self.msh.dummies:
-            dummy_obj = bpy.data.objects.new(msh_dummy.name, None)
+            dummy_obj_name = format_object_name(msh_dummy.name, "Dummy")
+
+            dummy_obj = bpy.data.objects.new(dummy_obj_name, None)
             dummy_obj.dragon_nest.type = 'OBJ'
             collection.objects.link(dummy_obj)
 
@@ -158,16 +168,18 @@ class MshImporter:
                 else:
                     col_name = "Collision %d" % idx
 
+                col_obj_name = format_object_name(col_name, "Collision")
+
                 if msh_collision.type == CollisionType.BOX:
                     loc_mat = translation_matrix(primitive.location.unpack())
                     rot_mat = Matrix(primitive.axis.unpack()).transposed().to_4x4()
                     scl_mat = scale_matrix(primitive.extent.unpack())
 
-                    col_obj = bpy.data.objects.new(col_name, None)
+                    col_obj = bpy.data.objects.new(col_obj_name, None)
                     col_obj.matrix_local = oriented_matrix(loc_mat @ rot_mat @ scl_mat)
 
                 elif msh_collision.type == CollisionType.SPHERE:
-                    col_obj = bpy.data.objects.new(col_name, None)
+                    col_obj = bpy.data.objects.new(col_obj_name, None)
                     col_obj.location = (primitive.location.x, primitive.location.z, primitive.location.y)
                     col_obj.scale = (primitive.radius,) * 3
 
@@ -182,7 +194,7 @@ class MshImporter:
                     rot_mat = rotation_matrix(rot)
                     scl_mat = scale_matrix((primitive.radius, height * 0.5 + primitive.radius, primitive.radius))
 
-                    col_obj = bpy.data.objects.new(col_name, None)
+                    col_obj = bpy.data.objects.new(col_obj_name, None)
                     col_obj.matrix_local = oriented_matrix(loc_mat @ rot_mat @ scl_mat)
 
                 elif msh_collision.type == CollisionType.TRIANGLE_LIST:
@@ -200,10 +212,10 @@ class MshImporter:
                     col_data = bpy.data.meshes.new(col_name)
                     col_data.from_pydata(vertices, [], faces)
 
-                    col_obj = bpy.data.objects.new(col_name, col_data)
+                    col_obj = bpy.data.objects.new(col_obj_name, col_data)
 
                 else:
-                    col_obj = bpy.data.objects.new(col_name, None)
+                    col_obj = bpy.data.objects.new(col_obj_name, None)
 
                 col_obj.dragon_nest.type = 'COL'
                 col_obj.dragon_nest.collision.type = str(msh_collision.type)
