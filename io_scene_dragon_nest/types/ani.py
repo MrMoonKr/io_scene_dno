@@ -7,12 +7,30 @@ from .reader import Reader
 
 @dataclass
 class KeyFrame:
+    '''
+        keyframe data for animation
+        
+        Attributes:
+            frame (int): time
+            value (Vector3D | Vector4D): key
+        '''
     frame: int
     value: Union[Vector3D, Vector4D]
 
 
 @dataclass
 class Animation:
+    '''
+        animation track data
+        
+        Attributes:
+            base_location (Vector3D): offset position
+            base_rotation (Vector4D): offset rotation
+            base_scale (Vector3D): offset scale
+            locations (List[KeyFrame]): position keyframes
+            rotations (List[KeyFrame]): rotation keyframes
+            scales (List[KeyFrame]): scale keyframes
+        '''
     base_location: Vector3D
     base_rotation: Vector4D
     base_scale: Vector3D
@@ -22,29 +40,30 @@ class Animation:
     scales: List[KeyFrame]
 
     @classmethod
-    def read(cls, reader: Reader, read_frame_func, read_rotation_func):
-        base_location = Vector3D.read(reader)
-        base_rotation = Vector4D.read(reader)
-        base_scale = Vector3D.read(reader)
+    def read( cls, reader: Reader, read_frame_func, read_rotation_func ):
+        base_location   = Vector3D.read( reader )
+        base_rotation   = Vector4D.read( reader )
+        base_scale      = Vector3D.read( reader )
+        
         locations, rotations, scales = [], [], []
 
         # locations
-        frames_num = reader.read_int()
-        for _ in range(frames_num):
-            frame, value = read_frame_func(), Vector3D.read(reader)
-            locations.append(KeyFrame(frame, value))
+        frames_num      = reader.read_int()
+        for _ in range( frames_num ):
+            frame, value = read_frame_func(), Vector3D.read( reader )
+            locations.append( KeyFrame( frame, value ) )
 
         # rotations
-        frames_num = reader.read_int()
-        for _ in range(frames_num):
-            frame, value = read_frame_func(), read_rotation_func(reader)
-            rotations.append(KeyFrame(frame, value))
+        frames_num      = reader.read_int()
+        for _ in range( frames_num ):
+            frame, value = read_frame_func(), read_rotation_func( reader )
+            rotations.append( KeyFrame( frame, value ) )
 
         # scales
-        frames_num = reader.read_int()
-        for _ in range(frames_num):
-            frame, value = read_frame_func(), Vector3D.read(reader)
-            scales.append(KeyFrame(frame, value))
+        frames_num      = reader.read_int()
+        for _ in range( frames_num ):
+            frame, value = read_frame_func(), Vector3D.read( reader )
+            scales.append( KeyFrame( frame, value ) )
 
         return cls(
             base_location, base_rotation, base_scale,
@@ -77,6 +96,14 @@ class Animation:
 
 @dataclass
 class AnimationBone:
+    '''
+        Bone Node with Animations
+        
+        Attributes:
+            name (str): name
+            parent_name (str): name of parent bone
+            animations (List[Animation]): animations
+        '''
     name: str
     parent_name: str
     animations: List[Animation]
@@ -108,43 +135,54 @@ class ANIM:
 
 
 class ANI:
+    '''
+        .ani file data loader and saver
+        
+        Attributes:
+            file_type (str): file id
+            version (int): file version, 11 
+            names (List[str]): action names
+            frames_num (List[int]): action frames
+            bones: List[AnimationBone] = []
+        
+        '''
 
-    def load_memory(self, data: bytes):
-        reader = Reader(data)
+    def load_memory( self, data: bytes ):
+        reader          = Reader( data )
 
-        self.file_type = reader.read_string(256)
+        self.file_type  = reader.read_string(256)
         if not self.file_type.startswith("Eternity Engine Ani File"):
             return
 
-        self.version = reader.read_int()
+        self.version    = reader.read_int()
         bones_num, anims_num = reader.read_int(2)
 
         reader._pos = 1024
 
-        self.names = [reader.read_string(256) for _ in range(anims_num)]
+        self.names      = [reader.read_string(256) for _ in range(anims_num)]
         self.frames_num = [reader.read_int() for _ in range(anims_num)]
 
         if self.version < 11:
-            read_frame_func = reader.read_int
-            read_rotation_func = Vector4D.read
+            read_frame_func     = reader.read_int
+            read_rotation_func  = Vector4D.read
         else:
-            read_frame_func = reader.read_short
-            read_rotation_func = Vector4D.read_short
+            read_frame_func     = reader.read_short
+            read_rotation_func  = Vector4D.read_short
 
         self.bones = []
-        for _ in range(bones_num):
-            bone_name = reader.read_string(256)
-            bone_parent_name = reader.read_string(256)
+        for _ in range( bones_num ):
+            bone_name           = reader.read_string(256)
+            bone_parent_name    = reader.read_string(256)
 
             reader.read_bytes(512)
 
-            bone_anims = []
-            for _ in range(anims_num):
-                anim = Animation.read(reader, read_frame_func, read_rotation_func)
-                bone_anims.append(anim)
+            bone_anims: List[Animation] = []
+            for _ in range( anims_num ):
+                anim = Animation.read( reader, read_frame_func, read_rotation_func )
+                bone_anims.append( anim )
 
-            bone = AnimationBone(bone_name, bone_parent_name, bone_anims)
-            self.bones.append(bone)
+            bone = AnimationBone( bone_name, bone_parent_name, bone_anims )
+            self.bones.append( bone )
 
     def save_memory(self) -> bytes:
         writer = Writer()
@@ -181,12 +219,12 @@ class ANI:
 
         return writer.data
 
-    def load_file(self, filename: str):
-        with open(filename, mode="rb") as file:
+    def load_file( self, filename: str ):
+        with open( filename, mode="rb" ) as file:
             data = file.read()
-            self.load_memory(data)
+            self.load_memory( data )
 
-    def save_file(self, filename: str):
+    def save_file( self, filename: str ):
         with open(filename, mode="wb") as file:
             data = self.save_memory()
             file.write(data)

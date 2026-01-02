@@ -8,7 +8,7 @@ from .reader import Reader
 from .writer import Writer
 
 
-class CollisionType(IntEnum):
+class CollisionType( IntEnum ):
     BOX           = 0
     SPHERE        = 1
     CAPSULE       = 2
@@ -34,7 +34,15 @@ class Bone:
 
 @dataclass
 class Dummy:
-    name: str
+    '''
+        Data Class for Dummy Node 
+        
+        Attributes:
+            name (str): Self Name
+            parent_name (str): Parent Name
+            transformation (Matrix4x4 | Vector3D): Transformation Matrix
+        '''
+    name: str 
     parent_name: str
     transformation: Union[Matrix4x4, Vector3D]
 
@@ -327,7 +335,7 @@ class Collision:
 
 class MSH:
 
-    def load_memory(self, data: bytes):
+    def load_memory( self, data: bytes ):
         reader = Reader(data)
 
         self.file_type = reader.read_string(256)

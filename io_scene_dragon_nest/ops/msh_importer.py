@@ -16,12 +16,12 @@ from ..types.msh import MSH, CollisionType
 
 class MshImporter:
 
-    def import_data(self, context, options):
+    def import_data(self, context: bpy.types.Context, options):
         view_layer = context.view_layer
         collection = view_layer.active_layer_collection.collection
 
-        global_scale = options.get("global_scale", 1.0)
-        append_armature = options.get("append_armature", False)
+        global_scale: float = options.get("global_scale", 1.0)
+        append_armature: bpy.types.Armature = options.get("append_armature", False)
 
         if append_armature:
             arm_obj = append_armature
@@ -231,7 +231,7 @@ class MshImporter:
         self.armature_object = arm_obj
         self.imported = True
 
-    def load_file(self, context, filename) -> bool:
+    def load_file(self, context: bpy.types.Context, filename: str) -> bool:
         self.msh = MSH()
         self.msh.load_file(filename)
 
@@ -250,7 +250,7 @@ class MshImporter:
         self.imported = False
 
 
-def load(context, filepath, *, global_scale=1.0, append_to_target=False):
+def load(context: bpy.types.Context, filepath: str, *, global_scale=1.0, append_to_target=False):
     append_armature = None
     if append_to_target:
         append_armature = context.view_layer.objects.active

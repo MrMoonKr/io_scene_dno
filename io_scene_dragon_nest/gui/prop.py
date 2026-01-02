@@ -65,7 +65,7 @@ class DN_CollisionObjectProps(bpy.types.PropertyGroup):
             ('3', 'Mesh', 'Mesh'),
         ),
         update = type_changed
-    )
+    ) # type: ignore
 
 class DN_ObjectProps(bpy.types.PropertyGroup):
 
@@ -109,44 +109,44 @@ class DN_ObjectProps(bpy.types.PropertyGroup):
             ('COL', 'Collision Object', 'Object is a collision object'),
             ('NONE', 'None', 'Do not export object'),
         )
-    )
+    ) # type: ignore
 
     # NOTE: bpy.props.StringProperty supports a search argument since version 3.3
     if bpy.app.version < (3, 3, 0):
         parent_name: bpy.props.StringProperty(
             name = "Parent Name",
             update = parent_name_changed
-        )
+        ) # type: ignore
     else:
         parent_name: bpy.props.StringProperty(
             name = "Parent Name",
             update = parent_name_changed,
             search = parent_name_search_func
-        )
+        ) # type: ignore
 
-    collision: bpy.props.PointerProperty(type=DN_CollisionObjectProps)
+    collision: bpy.props.PointerProperty(type=DN_CollisionObjectProps) # type: ignore
 
     show_bbox: bpy.props.BoolProperty(
         name = "Show BBox"
-    )
+    ) # type: ignore
 
     bbox_min: bpy.props.FloatVectorProperty(
         name = "BBox Min",
         size = 3,
         default = [-1.0, -1.0, -1.0]
-    )
+    ) # type: ignore
 
     bbox_max: bpy.props.FloatVectorProperty(
         name = "BBox Max",
         size = 3,
         default = [1.0, 1.0, 1.0]
-    )
+    ) # type: ignore
 
     use_tristrip: bpy.props.BoolProperty(
         name = "Use Triangle Strip",
         description="Use Triangle Strip instead of Triangle List",
         default = True
-    )
+    ) # type: ignore
 
     def draw_bbox(context):
         obj = context.object
@@ -189,7 +189,7 @@ class DN_MaterialExtraProps(bpy.types.PropertyGroup):
 
     name: bpy.props.StringProperty(
         name = "Name"
-    )
+    ) # type: ignore
 
     type: bpy.props.EnumProperty(
         name = "Type",
@@ -200,17 +200,17 @@ class DN_MaterialExtraProps(bpy.types.PropertyGroup):
             ('3', 'String', 'String'),
             ('4', 'None', 'None'),
         )
-    )
+    ) # type: ignore
 
-    integer_value: bpy.props.IntProperty()
-    float_value: bpy.props.FloatProperty()
-    vector_value: bpy.props.FloatVectorProperty(size = 4)
+    integer_value: bpy.props.IntProperty() # type: ignore
+    float_value: bpy.props.FloatProperty() # type: ignore
+    vector_value: bpy.props.FloatVectorProperty(size = 4) # type: ignore
 
     # NOTE: bpy.props.StringProperty supports a search argument since version 3.3
     if bpy.app.version < (3, 3, 0):
-        string_value: bpy.props.StringProperty()
+        string_value: bpy.props.StringProperty() # type: ignore
     else:
-        string_value: bpy.props.StringProperty(search = texture_search_func)
+        string_value: bpy.props.StringProperty(search = texture_search_func) # type: ignore
 
 
 class DN_MaterialProps(bpy.types.PropertyGroup):
@@ -242,16 +242,16 @@ class DN_MaterialProps(bpy.types.PropertyGroup):
         max = 1,
         default = 1,
         update = alpha_value_changed
-    )
+    ) # type: ignore
 
     enable_alpha_blend: bpy.props.BoolProperty(
         name = "Enable Alpha Blend"
-    )
+    ) # type: ignore
 
     enable_colors: bpy.props.BoolProperty(
         name = "Enable Colors",
         default = True
-    )
+    ) # type: ignore
 
     material_diffuse: bpy.props.FloatVectorProperty(
         name = "Material Diffuse",
@@ -259,68 +259,68 @@ class DN_MaterialProps(bpy.types.PropertyGroup):
         subtype = 'COLOR',
         default = [0.68, 0.68, 0.68, 1.0],
         update = material_diffuse_changed
-    )
+    ) # type: ignore
 
     material_ambient: bpy.props.FloatVectorProperty(
         name = "Material Ambient",
         size = 4,
         subtype = 'COLOR',
         default = [0.68, 0.68, 0.68, 1.0]
-    )
+    ) # type: ignore
 
     emissive_power: bpy.props.FloatProperty(
         name = "Emissive Power"
-    )
+    ) # type: ignore
 
     emissive_power_range: bpy.props.FloatProperty(
         name = "Emissive Power Range"
-    )
+    ) # type: ignore
 
     emissive_ani_speed: bpy.props.FloatProperty(
         name = "Emissive Animation Speed"
-    )
+    ) # type: ignore
 
     # NOTE: bpy.props.StringProperty supports a search argument since version 3.3
     if bpy.app.version < (3, 3, 0):
         effect: bpy.props.StringProperty(
             name = "Effect",
             default = "Diffuse.fx"
-        )
+        ) # type: ignore
 
         diffuse_texture: bpy.props.StringProperty(
             name = "Diffuse Texture"
-        )
+        ) # type: ignore
 
         emissive_texture: bpy.props.StringProperty(
             name = "Emissive Texture"
-        )
+        ) # type: ignore
 
         mask_texture: bpy.props.StringProperty(
             name = "Mask Texture"
-        )
+        ) # type: ignore
     else:
         effect: bpy.props.StringProperty(
             name = "Effect",
             default = "Diffuse.fx",
             search = effect_search_func
-        )
+        ) # type: ignore
 
         diffuse_texture: bpy.props.StringProperty(
             name = "Diffuse Texture",
             search = texture_search_func
-        )
+        ) # type: ignore
 
         emissive_texture: bpy.props.StringProperty(
             name = "Emissive Texture",
             search = texture_search_func
-        )
+        ) # type: ignore
 
         mask_texture: bpy.props.StringProperty(
             name = "Mask Texture",
             search = texture_search_func
-        )
+        ) # type: ignore
 
-    extra: bpy.props.CollectionProperty(type=DN_MaterialExtraProps)
+    extra: bpy.props.CollectionProperty(type=DN_MaterialExtraProps) # type: ignore
 
     def register():
         bpy.types.Material.dragon_nest = bpy.props.PointerProperty(type=DN_MaterialProps)
@@ -331,7 +331,7 @@ class DN_BoneProps(bpy.types.PropertyGroup):
     scale: bpy.props.FloatVectorProperty(
         size = 3,
         default = (1.0, 1.0, 1.0),
-    )
+    ) # type: ignore
 
     def register():
         bpy.types.Bone.dragon_nest = bpy.props.PointerProperty(type=DN_BoneProps)
@@ -339,7 +339,7 @@ class DN_BoneProps(bpy.types.PropertyGroup):
 
 class DN_ActionProps(bpy.types.PropertyGroup):
 
-    use_export: bpy.props.BoolProperty(name="Use Export", default=True)
+    use_export: bpy.props.BoolProperty(name="Use Export", default=True) # type: ignore
 
     def register():
         bpy.types.Action.dragon_nest = bpy.props.PointerProperty(type=DN_ActionProps)

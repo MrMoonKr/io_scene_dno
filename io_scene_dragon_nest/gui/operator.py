@@ -29,7 +29,7 @@ class DN_AnimChooserBox(bpy.types.Operator):
 
         return items
 
-    anim_list: EnumProperty(items=anim_enum_callback, name="Animation Name")
+    anim_list: EnumProperty(items=anim_enum_callback, name="Animation Name") # type: ignore
 
     def execute(self, context):
         global ani_imp
@@ -55,13 +55,18 @@ class DN_AnimChooserBox(bpy.types.Operator):
         ani_imp = None
 
 
-class DN_Import(bpy.types.Operator, ImportHelper):
-    bl_idname = "import_scene.dragon_nest"
-    bl_label = "Import Dragon Nest Model / Animation"
-    bl_options = {'PRESET', 'UNDO'}
+class DN_Import( bpy.types.Operator, ImportHelper ):
+    '''
+        bpy.types.Operator and  
+        bpy_extras.io_utils.ImportHelper extension  
+        for "*.skn;*.msh;*.ani" file  
+        '''
+    bl_idname       = "import_scene.dragon_nest"
+    bl_label        = "Import Dragon Nest Model / Animation"
+    bl_options      = {'PRESET', 'UNDO'}
 
-    filename_ext = ".skn"
-    filter_glob: StringProperty(default="*.skn;*.msh;*.ani;*.anim", options={'HIDDEN'})
+    filename_ext    = ".skn"
+    filter_glob: StringProperty( default="*.skn;*.msh;*.ani;*.anim", options={'HIDDEN'} ) # type: ignore
 
     global_scale: FloatProperty(
         name = "Scale",
@@ -69,16 +74,16 @@ class DN_Import(bpy.types.Operator, ImportHelper):
         min = 0.001,
         max = 1000.0,
         default = 1.0
-    )
+    ) # type: ignore
 
     append_to_target: BoolProperty(
         name = "Append to Target Armature",
         description = "Attach the imported mesh to the selected armature",
         default = False,
-    )
+    ) # type: ignore
 
-    def execute(self, context):
-        keywords = self.as_keywords(ignore=("filter_glob",))
+    def execute( self, context ):
+        keywords = self.as_keywords( ignore=("filter_glob",) )
 
         filepath = keywords["filepath"]
         if filepath.lower().endswith(".skn"):
@@ -95,7 +100,7 @@ class DN_Import(bpy.types.Operator, ImportHelper):
             from ..ops import ani_importer
 
             global ani_imp
-            ani_imp = ani_importer.load(context, filepath)
+            ani_imp = ani_importer.load( context, filepath )
             if not ani_imp:
                 return {'CANCELLED'}
 
@@ -111,7 +116,7 @@ class DN_ExportSKN(bpy.types.Operator, ExportHelper):
     bl_options = {'PRESET'}
 
     filename_ext = ".skn"
-    filter_glob: StringProperty(default="*.skn", options={'HIDDEN'})
+    filter_glob: StringProperty(default="*.skn", options={'HIDDEN'}) # type: ignore
 
     skn_version: EnumProperty(
         name = "Skin Version",
@@ -119,7 +124,7 @@ class DN_ExportSKN(bpy.types.Operator, ExportHelper):
             ('10', '10', ''),
         ),
         default = '10'
-    )
+    ) # type: ignore
 
     msh_version: EnumProperty(
         name = "Mesh Version",
@@ -130,18 +135,18 @@ class DN_ExportSKN(bpy.types.Operator, ExportHelper):
             ('13', '13', ''),
         ),
         default = '13'
-    )
+    ) # type: ignore
 
     msh_name: StringProperty(
         name = "Custom MSH File Name",
         description = "File name used for exporting the MSH file. Leave blank if MSH name is same as SKN name"
-    )
+    ) # type: ignore
 
     apply_root_transform: BoolProperty(
         name = "Apply Root Transform",
         description = "Apply root armature transformation",
         default = True,
-    )
+    ) # type: ignore
 
     def execute(self, context):
         filepath = self.filepath
@@ -165,7 +170,7 @@ class DN_ExportMSH(bpy.types.Operator, ExportHelper):
     bl_options = {'PRESET'}
 
     filename_ext = ".msh"
-    filter_glob: StringProperty(default="*.msh", options={'HIDDEN'})
+    filter_glob: StringProperty(default="*.msh", options={'HIDDEN'}) # type: ignore
 
     msh_version: EnumProperty(
         name = "Mesh Version",
@@ -176,13 +181,13 @@ class DN_ExportMSH(bpy.types.Operator, ExportHelper):
             ('13', '13', ''),
         ),
         default = '13'
-    )
+    ) # type: ignore
 
     apply_root_transform: BoolProperty(
         name = "Apply Root Transform",
         description = "Apply root armature transformation",
         default = True,
-    )
+    ) # type: ignore
 
     def execute(self, context):
         filepath = self.filepath
@@ -204,7 +209,7 @@ class DN_ExportANI(bpy.types.Operator, ExportHelper):
     bl_options = {'PRESET'}
 
     filename_ext = ".ani"
-    filter_glob: StringProperty(default="*.ani", options={'HIDDEN'})
+    filter_glob: StringProperty(default="*.ani", options={'HIDDEN'}) # type: ignore
 
     ani_version: EnumProperty(
         name = "Animation Version",
@@ -213,13 +218,13 @@ class DN_ExportANI(bpy.types.Operator, ExportHelper):
             ('11', '11', ''),
         ),
         default = '11'
-    )
+    ) # type: ignore
 
     apply_root_transform: BoolProperty(
         name = "Apply Root Transform",
         description = "Apply root armature transformation",
         default = True,
-    )
+    ) # type: ignore
 
     def draw(self, context):
         layout = self.layout
@@ -261,7 +266,7 @@ class DN_RemoveExtraPropItem(bpy.types.Operator):
     bl_label = "Remove Item"
     bl_idname = "material.dragon_nest_remove_extra_prop_item"
 
-    index: IntProperty()
+    index: IntProperty() # type: ignore
 
     def execute(self, context):
         material = context.material

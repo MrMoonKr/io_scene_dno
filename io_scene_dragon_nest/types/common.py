@@ -6,6 +6,9 @@ from .writer import Writer
 
 @dataclass
 class Vector3D:
+    '''
+        float3 : x, y, z
+        '''
     x: float
     y: float
     z: float
@@ -23,6 +26,9 @@ class Vector3D:
 
 @dataclass
 class Vector4D:
+    '''
+        float4 : x, y, z, w
+        '''
     x: float
     y: float
     z: float
@@ -50,6 +56,9 @@ class Vector4D:
 
 @dataclass
 class Matrix3x3:
+    ''' 
+        float3x3
+        '''
     v1: Vector3D
     v2: Vector3D
     v3: Vector3D
@@ -85,6 +94,9 @@ class Matrix3x3:
 
 @dataclass
 class Matrix4x4:
+    '''
+        float4x4
+        '''
     v1: Vector4D
     v2: Vector4D
     v3: Vector4D

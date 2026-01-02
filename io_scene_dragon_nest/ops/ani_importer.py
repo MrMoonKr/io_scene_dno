@@ -28,9 +28,9 @@ def find_last_keyframe_time(action):
     return int(last_frame)
 
 
-def get_active_armature(context):
+def get_active_armature( context: bpy.types.Context ) -> bpy.types.Object:
     arm_obj = context.view_layer.objects.active
-    if arm_obj and type(arm_obj.data) == bpy.types.Armature:
+    if arm_obj and type( arm_obj.data ) == bpy.types.Armature:
         return arm_obj
 
 
@@ -38,19 +38,19 @@ def local_to_basis_matrix(local_matrix, global_matrix, parent_matrix):
     return global_matrix.inverted() @ (parent_matrix @ local_matrix)
 
 
-def connect_armature_bones(context, armature, animation_bones: List[AnimationBone]) -> bool:
-    bpy.ops.object.mode_set(mode='EDIT')
+def connect_armature_bones( context: bpy.types.Context, armature: bpy.types.Armature, animation_bones: List[AnimationBone]) -> bool:
+    bpy.ops.object.mode_set( mode='EDIT' )
 
     for ani_bone in animation_bones:
-        arm_bone = armature.edit_bones.get(ani_bone.name) or armature.edit_bones.get(ani_bone.name[:-2])
+        arm_bone = armature.edit_bones.get( ani_bone.name ) or armature.edit_bones.get( ani_bone.name[:-2] )
         if not arm_bone:
-            context.window_manager.popup_menu(gui.invalid_armature, title='Error', icon='ERROR')
-            bpy.ops.object.mode_set(mode='OBJECT')
+            context.window_manager.popup_menu( gui.invalid_armature, title='Error', icon='ERROR' )
+            bpy.ops.object.mode_set( mode='OBJECT' )
             return False
 
-        arm_bone.parent = armature.edit_bones.get(ani_bone.parent_name)
+        arm_bone.parent = armature.edit_bones.get( ani_bone.parent_name )
 
-    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.mode_set( mode='OBJECT' )
     return True
 
 
@@ -117,19 +117,19 @@ def create_actions(armature_object, animation_bones: List[AnimationBone], anim_i
 
 class AniImporter:
 
-    def import_data(self, context, options):
+    def import_data( self, context: bpy.types.Context, options ):
         anim_id = options.get("animation_id")
         if anim_id is None:
             anim_id = ANIM_ID_ALL
         elif anim_id != ANIM_ID_ALL:
-            anim_id = max(0, min(anim_id, len(self.ani.names) - 1))
+            anim_id = max( 0, min( anim_id, len( self.ani.names ) - 1 ) )
 
-        arm_obj = get_active_armature(context)
+        arm_obj = get_active_armature( context )
         if not arm_obj:
             return
 
         arm = arm_obj.data
-        if not connect_armature_bones(context, arm, self.ani.bones):
+        if not connect_armature_bones( context, arm, self.ani.bones ):
             return
 
         actions = create_actions(arm_obj, self.ani.bones, anim_id)
@@ -146,12 +146,12 @@ class AniImporter:
 
         self.imported = True
 
-    def load_file(self, context, filename) -> bool:
+    def load_file( self, context: bpy.types.Context, filename: str ) -> bool:
         self.ani = ANI()
-        self.ani.load_file(filename)
+        self.ani.load_file( filename )
 
-        if not self.ani.file_type.startswith("Eternity Engine Ani File"):
-            context.window_manager.popup_menu(gui.invalid_ani_type, title='Error', icon='ERROR')
+        if not self.ani.file_type.startswith( "Eternity Engine Ani File" ):
+            context.window_manager.popup_menu( gui.invalid_ani_type, title='Error', icon='ERROR' )
             return False
 
         return True
@@ -195,25 +195,27 @@ class AnimImporter:
         self.imported = False
 
 
-def load(context, filepath):
-    arm_obj = get_active_armature(context)
+def load( context: bpy.types.Context, filepath: str ):
+    arm_obj = get_active_armature( context )
     if not arm_obj:
         return None
 
     if filepath.lower().endswith(".ani"):
         importer = AniImporter()
-        if not importer.load_file(context, filepath):
+        if not importer.load_file( context, filepath ):
             return None
 
-    if filepath.lower().endswith(".anim"):
-        importer = AnimImporter()
-        if not importer.load_file(context, filepath):
-            return None
+    # .anim file will not support. sorry
+    
+    # if filepath.lower().endswith( ".anim" ):
+    #     importer = AnimImporter()
+    #     if not importer.load_file( context, filepath ):
+    #         return None
 
-        importer.import_data(context, {})
-        if not importer.action:
-            return None
+    #     importer.import_data( context, {} )
+    #     if not importer.action:
+    #         return None
 
-        importer.action.name = os.path.basename(filepath)[:-5]
+    #     importer.action.name = os.path.basename(filepath)[:-5]
 
     return importer
