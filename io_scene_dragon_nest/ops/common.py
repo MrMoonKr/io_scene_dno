@@ -1,3 +1,4 @@
+from bpy.types import ( Context, Object )
 from mathutils import Matrix
 
 ORIENTATION_MATRIX = Matrix(((1.0, 0.0, 0.0, 0.0),
@@ -7,10 +8,16 @@ ORIENTATION_MATRIX = Matrix(((1.0, 0.0, 0.0, 0.0),
 
 
 def oriented_matrix(mat: Matrix) -> Matrix:
+    '''
+        Dragon Nest -> Blender
+        '''
     return ORIENTATION_MATRIX @ mat @ ORIENTATION_MATRIX
 
 
 def unoriented_matrix(mat: Matrix) -> Matrix:
+    '''
+        Blender -> Dragon Nest
+        '''
     return ORIENTATION_MATRIX.inverted() @ mat @ ORIENTATION_MATRIX.inverted()
 
 
@@ -28,7 +35,7 @@ def scale_matrix(v):
     return mat
 
 
-def get_active_armature_object(context):
+def get_active_armature_object(context: Context):
     arm_obj = context.object
     if not arm_obj:
         return
@@ -41,7 +48,7 @@ def get_active_armature_object(context):
         return arm_obj
 
 
-def get_armature_matrices(armature_object):
+def get_armature_matrices(armature_object: Object):
     matrices = {}
     for bone in armature_object.data.bones:
         matrices[bone.name] = bone.matrix_local @ scale_matrix(bone.dragon_nest.scale)
@@ -62,7 +69,7 @@ def format_object_name(name, suffix="Object"):
     return name
 
 
-def extract_object_name(obj):
+def extract_object_name(obj: Object):
     name = obj.name
 
     if name.startswith("Unnamed "):
