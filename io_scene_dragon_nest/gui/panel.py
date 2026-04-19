@@ -1,9 +1,10 @@
 import bpy
 
+from bpy.types import Context, Object, Armature
 from .operator import DN_AddExtraPropItem, DN_RemoveExtraPropItem
 
 
-class OBJECT_PT_DNObjects(bpy.types.Panel):
+class OBJECT_PT_DNObjects( bpy.types.Panel ):
 
     bl_idname      = "OBJECT_PT_DNObjects"
     bl_label       = "Dragon Nest"
@@ -67,57 +68,57 @@ class OBJECT_PT_DNObjects(bpy.types.Panel):
 
         box.prop(settings, "type", text="Type")
 
-    def draw(self, context):
+    def draw( self, context: Context ):
         if not context.object.dragon_nest:
             return
 
-        self.draw_obj_menu(context)
+        self.draw_obj_menu( context )
 
 
-class MATERIAL_PT_DNMaterials(bpy.types.Panel):
+class MATERIAL_PT_DNMaterials( bpy.types.Panel ):
 
-    bl_idname      = "MATERIAL_PT_DNMaterials"
-    bl_label       = "Dragon Nest"
-    bl_space_type  = "PROPERTIES"
-    bl_region_type = "WINDOW"
-    bl_context     = "material"
+    bl_idname       = "MATERIAL_PT_DNMaterials"
+    bl_label        = "Dragon Nest"
+    bl_space_type   = "PROPERTIES"
+    bl_region_type  = "WINDOW"
+    bl_context      = "material"
 
-    def draw_material_menu(self, context):
-        layout = self.layout
-        settings = context.material.dragon_nest
+    def draw_material_menu( self, context: Context ):
+        layout      = self.layout
+        settings    = context.material.dragon_nest
 
-        layout.prop(settings, "effect", text="Effect")
-        layout.prop(settings, "alpha_value", text="Alpha Value")
-        layout.prop(settings, "enable_alpha_blend", text="Enable Alpha Blend")
+        layout.prop( settings, "effect", text="Effect" )
+        layout.prop( settings, "alpha_value", text="Alpha Value" )
+        layout.prop( settings, "enable_alpha_blend", text="Enable Alpha Blend" )
 
-        box = layout.box()
-        box.label(text="Textures")
+        box         = layout.box()
+        box.label( text="Textures" )
 
-        box.prop(settings, "diffuse_texture", text="Diffuse")
-        box.prop(settings, "emissive_texture", text="Emissive")
-        box.prop(settings, "mask_texture", text="Mask")
+        box.prop( settings, "diffuse_texture", text="Diffuse" )
+        box.prop( settings, "emissive_texture", text="Emissive" )
+        box.prop( settings, "mask_texture", text="Mask" )
 
-        box = layout.box()
-        box.prop(settings, "enable_colors", text="Colors")
+        box         = layout.box()
+        box.prop( settings, "enable_colors", text="Colors" )
         if settings.enable_colors:
-            box.prop(settings, "material_diffuse", text="Material Diffuse")
-            box.prop(settings, "material_ambient", text="Material Ambient")
+            box.prop( settings, "material_diffuse", text="Material Diffuse" )
+            box.prop( settings, "material_ambient", text="Material Ambient" )
 
         if settings.emissive_texture:
-            box = layout.box()
-            box.label(text="Emissive")
+            box     = layout.box()
+            box.label( text="Emissive" )
 
-            box.prop(settings, "emissive_power", text="Emissive Power")
-            box.prop(settings, "emissive_power_range", text="Emissive Power Range")
-            box.prop(settings, "emissive_ani_speed", text="Emissive Animation Speed")
+            box.prop( settings, "emissive_power", text="Emissive Power" )
+            box.prop( settings, "emissive_power_range", text="Emissive Power Range" )
+            box.prop( settings, "emissive_ani_speed", text="Emissive Animation Speed" )
 
         box = layout.box()
-        box.label(text="Extra")
+        box.label( text="Extra" )
 
-        for idx, extra_prop in enumerate(settings.extra):
+        for idx, extra_prop in enumerate( settings.extra ):
             prop_box = box.box()
-            prop_box.prop(extra_prop, "name", text="Name")
-            prop_box.prop(extra_prop, "type", text="Type")
+            prop_box.prop( extra_prop, "name", text="Name" )
+            prop_box.prop( extra_prop, "type", text="Type" )
 
             if extra_prop.type < "4":
                 value_name = {
@@ -126,14 +127,14 @@ class MATERIAL_PT_DNMaterials(bpy.types.Panel):
                     "2": "vector_value",
                     "3": "string_value",
                 }[extra_prop.type]
-                prop_box.prop(extra_prop, value_name, text="Value")
+                prop_box.prop( extra_prop, value_name, text="Value" )
 
-            prop_box.operator(DN_RemoveExtraPropItem.bl_idname, icon='REMOVE', text="Remove Item").index = idx
+            prop_box.operator( DN_RemoveExtraPropItem.bl_idname, icon='REMOVE', text="Remove Item" ).index = idx
 
-        box.operator(DN_AddExtraPropItem.bl_idname, icon='ADD', text="Add Item")
+        box.operator( DN_AddExtraPropItem.bl_idname, icon='ADD', text="Add Item" )
 
-    def draw(self, context):
+    def draw( self, context: Context ):
         if not context.material or not context.material.dragon_nest:
             return
 
-        self.draw_material_menu(context)
+        self.draw_material_menu( context )

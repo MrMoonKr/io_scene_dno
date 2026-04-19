@@ -12,45 +12,47 @@ from bpy_extras.io_utils import (
         )
 
 
-class DN_AnimChooserBox(bpy.types.Operator):
-    bl_idname = "dialog.anim_chooser_box"
-    bl_label = "Choose animation for import"
-    bl_options = {'REGISTER'}
+class DN_AnimChooserBox( bpy.types.Operator ):
+    '''
+        dialog box for animation choose
+        '''
+    bl_idname       = "dialog.anim_chooser_box"
+    bl_label        = "Choose animation for import"
+    bl_options      = {'REGISTER'}
 
-    def anim_enum_callback(self, context):
+    def anim_enum_callback( self, context ):
         global ani_imp
-
         if not ani_imp:
             return []
 
-        items = [("0", "*All*", "", 0)]
-        for i, name in enumerate(ani_imp.ani.names):
-            items.append((str(i+1), name, "", i+1))
+        items = [("0", "*All*", "", 0)] # ( identifier, display name, description, arrange number ) for EnumProperty
+        for i, name in enumerate( ani_imp.ani.names ):
+            items.append( ( str(i+1), name, "", i+1 ) )
 
         return items
 
-    anim_list: EnumProperty(items=anim_enum_callback, name="Animation Name") # type: ignore
+    anim_list: EnumProperty( items=anim_enum_callback, name="Animation Name" ) # type: ignore
 
-    def execute(self, context):
+    def execute( self, context ):
         global ani_imp
 
         if not self.anim_list:
             return {'CANCELLED'}
 
         options = {
-            "animation_id": int(self.anim_list) - 1,
+            "animation_id": int( self.anim_list ) - 1,
         }
 
-        ani_imp.import_data(context, options)
+        ani_imp.import_data( context, options )
         imported = ani_imp.imported
 
         ani_imp = None
         return {'FINISHED'} if imported else {'CANCELLED'}
 
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
+    def invoke( self, context, event ):
+        return context.window_manager.invoke_props_dialog( self )
 
-    def cancel(self, context):
+    def cancel( self, context ):
         global ani_imp
         ani_imp = None
 
@@ -73,7 +75,7 @@ class DN_Import( bpy.types.Operator, ImportHelper ):
         description = "Root armature scale",
         min = 0.001,
         max = 1000.0,
-        default = 1.0
+        default = 0.02
     ) # type: ignore
 
     append_to_target: BoolProperty(

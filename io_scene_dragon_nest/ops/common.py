@@ -1,41 +1,43 @@
-from bpy.types import ( Context, Object )
-from mathutils import Matrix
+from collections.abc import Iterable, Sequence
 
-ORIENTATION_MATRIX = Matrix(((1.0, 0.0, 0.0, 0.0),
-                             (0.0, 0.0, 1.0, 0.0),
-                             (0.0, 1.0, 0.0, 0.0),
-                             (0.0, 0.0, 0.0, 1.0)))
+from bpy.types import Context, Node, Object
+from mathutils import Euler, Matrix, Quaternion, Vector
+
+ORIENTATION_MATRIX: Matrix = Matrix(((1.0, 0.0, 0.0, 0.0),
+                                     (0.0, 0.0, 1.0, 0.0),
+                                     (0.0, 1.0, 0.0, 0.0),
+                                     (0.0, 0.0, 0.0, 1.0)))
 
 
-def oriented_matrix(mat: Matrix) -> Matrix:
+def oriented_matrix( mat: Matrix ) -> Matrix:
     '''
         Dragon Nest -> Blender
         '''
     return ORIENTATION_MATRIX @ mat @ ORIENTATION_MATRIX
 
 
-def unoriented_matrix(mat: Matrix) -> Matrix:
+def unoriented_matrix( mat: Matrix ) -> Matrix:
     '''
         Blender -> Dragon Nest
         '''
     return ORIENTATION_MATRIX.inverted() @ mat @ ORIENTATION_MATRIX.inverted()
 
 
-def translation_matrix(v):
-    return Matrix.Translation(v)
+def translation_matrix( v: Vector | Sequence[float] ) -> Matrix:
+    return Matrix.Translation( v )
 
 
-def rotation_matrix(v):
+def rotation_matrix( v: Quaternion | Euler ) -> Matrix:
     return v.to_matrix().to_4x4()
 
 
-def scale_matrix(v):
+def scale_matrix( v: Vector | Sequence[float] ) -> Matrix:
     mat = Matrix.Identity(4)
     mat[0][0], mat[1][1], mat[2][2] = v[0], v[1], v[2]
     return mat
 
 
-def get_active_armature_object(context: Context):
+def get_active_armature_object( context: Context ) -> Object | None:
     arm_obj = context.object
     if not arm_obj:
         return
@@ -48,18 +50,18 @@ def get_active_armature_object(context: Context):
         return arm_obj
 
 
-def get_armature_matrices(armature_object: Object):
-    matrices = {}
+def get_armature_matrices( armature_object: Object ) -> dict[str, Matrix]:
+    matrices: dict[str, Matrix] = {}
     for bone in armature_object.data.bones:
         matrices[bone.name] = bone.matrix_local @ scale_matrix(bone.dragon_nest.scale)
     return matrices
 
 
-def find_material_node(nodes, node_type):
+def find_material_node( nodes: Iterable[Node], node_type: str ) -> Node | None:
     return next((node for node in nodes if node.type == node_type), None)
 
 
-def format_object_name(name, suffix="Object"):
+def format_object_name( name: str | None, suffix: str = "Object" ) -> str:
     if not name:
         return "Unnamed " + suffix
 
@@ -69,7 +71,7 @@ def format_object_name(name, suffix="Object"):
     return name
 
 
-def extract_object_name(obj: Object):
+def extract_object_name( obj: Object ) -> str:
     name = obj.name
 
     if name.startswith("Unnamed "):

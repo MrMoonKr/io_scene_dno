@@ -1,6 +1,10 @@
-# io_scene_dragon_nest
+# io_scene_dno
 
-**dn-model-import** is a plugin for Blender 3D that allows you to import/export 3D models
+( WIP )
+
+Model Importer for Blender from Dragon Nest Online Game.  
+
+**io_scene_dno** is a plugin for Blender 3D that allows you to import/export 3D models
 and animations from Dragon Nest game into the editor.
 It works with formats such as: skin data (`.skn`), models (`.msh`) and animations (`.ani`, `.anim`).
 

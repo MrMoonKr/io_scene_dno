@@ -6,6 +6,9 @@ class Reader:
 
     # buffered returns the number of bytes that can be read from the current reader
     def buffered(self) -> int:
+        '''
+            returns the number of bytes that can be read from the current reader
+            '''
         return len(self._data) - self._pos
 
     def read_bytes(self, size: int) -> bytes:

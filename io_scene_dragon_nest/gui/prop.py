@@ -337,9 +337,9 @@ class DN_BoneProps(bpy.types.PropertyGroup):
         bpy.types.Bone.dragon_nest = bpy.props.PointerProperty(type=DN_BoneProps)
 
 
-class DN_ActionProps(bpy.types.PropertyGroup):
+class DN_ActionProps( bpy.types.PropertyGroup ):
 
-    use_export: bpy.props.BoolProperty(name="Use Export", default=True) # type: ignore
+    use_export: bpy.props.BoolProperty( name="Use Export", default=True ) # type: ignore
 
     def register():
-        bpy.types.Action.dragon_nest = bpy.props.PointerProperty(type=DN_ActionProps)
+        bpy.types.Action.dragon_nest = bpy.props.PointerProperty( type=DN_ActionProps )

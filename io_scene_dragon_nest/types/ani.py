@@ -70,28 +70,28 @@ class Animation:
             locations, rotations, scales,
         )
 
-    def write(self, writer: Writer, write_frame_func, write_rotation_func):
-        self.base_location.write(writer)
-        self.base_rotation.write(writer)
-        self.base_scale.write(writer)
+    def write( self, writer: Writer, write_frame_func, write_rotation_func ):
+        self.base_location.write( writer )
+        self.base_rotation.write( writer )
+        self.base_scale.write( writer )
 
         # locations
-        writer.write_int(len(self.locations))
+        writer.write_int( len ( self.locations ) )
         for kf in self.locations:
-            write_frame_func(kf.frame)
-            kf.value.write(writer)
+            write_frame_func( kf.frame )
+            kf.value.write( writer )
 
         # rotations
-        writer.write_int(len(self.rotations))
+        writer.write_int( len( self.rotations ) )
         for kf in self.rotations:
-            write_frame_func(kf.frame)
-            write_rotation_func(kf.value, writer)
+            write_frame_func( kf.frame )
+            write_rotation_func( kf.value, writer )
 
         # scales
-        writer.write_int(len(self.scales))
+        writer.write_int( len( self.scales ) )
         for kf in self.scales:
-            write_frame_func(kf.frame)
-            kf.value.write(writer)
+            write_frame_func( kf.frame )
+            kf.value.write( writer )
 
 
 @dataclass
@@ -111,26 +111,25 @@ class AnimationBone:
 
 class ANIM:
 
-    def load_memory(self, data: bytes):
-        reader = Reader(data)
-
+    def load_memory( self, data: bytes ):
+        reader = Reader( data )
         while reader.buffered() > 0:
-            bone_name = reader.read_string()
-            bone_parent_name = reader.read_string()
-            bone_anims = [Animation.read(reader, reader.read_short, Vector4D.read_short)]
+            bone_name           = reader.read_string()
+            bone_parent_name    = reader.read_string()
+            bone_anims          = [Animation.read(reader, reader.read_short, Vector4D.read_short)]
 
-            bone = AnimationBone(bone_name, bone_parent_name, bone_anims)
-            self.bones.append(bone)
+            bone = AnimationBone( bone_name, bone_parent_name, bone_anims )
+            self.bones.append( bone )
 
-    def load_file(self, filename: str):
-        with open(filename, mode="rb") as file:
+    def load_file( self, filename: str ):
+        with open( filename, mode="rb" ) as file:
             data = file.read()
-            self.load_memory(data)
+            self.load_memory( data )
 
-    def clear(self):
+    def clear( self ):
         self.bones: List[AnimationBone] = []
 
-    def __init__(self):
+    def __init__( self ):
         self.clear()
 
 
@@ -150,17 +149,17 @@ class ANI:
     def load_memory( self, data: bytes ):
         reader          = Reader( data )
 
-        self.file_type  = reader.read_string(256)
-        if not self.file_type.startswith("Eternity Engine Ani File"):
+        self.file_type  = reader.read_string( 256 )
+        if not self.file_type.startswith( "Eternity Engine Ani File" ):
             return
 
         self.version    = reader.read_int()
         bones_num, anims_num = reader.read_int(2)
 
-        reader._pos = 1024
+        reader._pos     = 1024
 
-        self.names      = [reader.read_string(256) for _ in range(anims_num)]
-        self.frames_num = [reader.read_int() for _ in range(anims_num)]
+        self.names      = [ reader.read_string( 256 ) for _ in range( anims_num ) ]
+        self.frames_num = [ reader.read_int() for _ in range( anims_num ) ]
 
         if self.version < 11:
             read_frame_func     = reader.read_int
@@ -171,10 +170,10 @@ class ANI:
 
         self.bones = []
         for _ in range( bones_num ):
-            bone_name           = reader.read_string(256)
-            bone_parent_name    = reader.read_string(256)
+            bone_name           = reader.read_string( 256 )
+            bone_parent_name    = reader.read_string( 256 )
 
-            reader.read_bytes(512)
+            reader.read_bytes( 512 )
 
             bone_anims: List[Animation] = []
             for _ in range( anims_num ):
@@ -184,38 +183,38 @@ class ANI:
             bone = AnimationBone( bone_name, bone_parent_name, bone_anims )
             self.bones.append( bone )
 
-    def save_memory(self) -> bytes:
+    def save_memory( self ) -> bytes:
         writer = Writer()
 
-        writer.write_string(self.file_type, 256)
-        writer.write_int(self.version)
+        writer.write_string( self.file_type, 256 )
+        writer.write_int( self.version )
 
-        bones_num = len(self.bones)
-        anims_num = len(self.names)
+        bones_num = len( self.bones )
+        anims_num = len( self.names )
 
-        writer.write_int((bones_num, anims_num))
-        writer.write_bytes(b'\0' * (1024 - len(writer.data)))
+        writer.write_int( ( bones_num, anims_num ) )
+        writer.write_bytes( b'\0' * ( 1024 - len( writer.data ) ) )
 
         for name in self.names:
-            writer.write_string(name, 256)
+            writer.write_string( name, 256 )
 
-        writer.write_int(self.frames_num)
+        writer.write_int( self.frames_num )
 
         if self.version < 11:
-            write_frame_func = writer.write_int
+            write_frame_func    = writer.write_int
             write_rotation_func = Vector4D.write
         else:
-            write_frame_func = writer.write_short
+            write_frame_func    = writer.write_short
             write_rotation_func = Vector4D.write_short
 
         for bone in self.bones:
-            writer.write_string(bone.name, 256)
-            writer.write_string(bone.parent_name, 256)
+            writer.write_string( bone.name, 256 )
+            writer.write_string( bone.parent_name, 256 )
 
-            writer.write_bytes(b'\0' * 512)
+            writer.write_bytes( b'\0' * 512 )
 
             for anim in bone.animations:
-                anim.write(writer, write_frame_func, write_rotation_func)
+                anim.write( writer, write_frame_func, write_rotation_func )
 
         return writer.data
 
@@ -225,16 +224,16 @@ class ANI:
             self.load_memory( data )
 
     def save_file( self, filename: str ):
-        with open(filename, mode="wb") as file:
+        with open( filename, mode="wb" ) as file:
             data = self.save_memory()
-            file.write(data)
+            file.write( data )
 
-    def clear(self):
+    def clear( self ):
         self.file_type = ""
         self.version = 0
         self.names: List[str] = []
         self.frames_num: List[int] = []
         self.bones: List[AnimationBone] = []
 
-    def __init__(self):
+    def __init__( self ):
         self.clear()
